@@ -133,9 +133,9 @@ class ReceiptState extends State<Receipt> {
               boundaryMargin: EdgeInsets.zero,
               clipBehavior: Clip.none,
               child: Padding(
-                padding: const EdgeInsets.all(16.0),
+                padding: const EdgeInsets.all(1.0),
                 child: Container(
-                  padding: const EdgeInsets.all(24),
+                  padding: const EdgeInsets.all(1),
                   color: Colors.white,
                   child: receipt,
                 ),
