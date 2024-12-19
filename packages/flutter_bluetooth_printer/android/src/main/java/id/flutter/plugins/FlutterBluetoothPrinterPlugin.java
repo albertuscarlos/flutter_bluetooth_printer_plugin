@@ -115,39 +115,41 @@ public class FlutterBluetoothPrinterPlugin implements FlutterPlugin, ActivityAwa
     }
 
     private boolean ensurePermission(boolean request) {
-        if (SDK_INT >= Build.VERSION_CODES.M) {
-            if (SDK_INT >= 31) {
-                final boolean bluetooth = activity.checkSelfPermission(Manifest.permission.BLUETOOTH) == PackageManager.PERMISSION_GRANTED;
-                final boolean bluetoothScan = activity.checkSelfPermission(Manifest.permission.BLUETOOTH_SCAN) == PackageManager.PERMISSION_GRANTED;
-                final boolean bluetoothConnect = activity.checkSelfPermission(Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED;
+    Context context = (activity != null) ? activity : flutterPluginBinding.getApplicationContext();
 
-                if (bluetooth && bluetoothScan && bluetoothConnect) {
-                    return true;
-                }
+    if (SDK_INT >= Build.VERSION_CODES.M) {
+        if (SDK_INT >= 31) {
+            final boolean bluetoothScan = context.checkSelfPermission(Manifest.permission.BLUETOOTH_SCAN) == PackageManager.PERMISSION_GRANTED;
+            final boolean bluetoothConnect = context.checkSelfPermission(Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED;
 
-                if (!request) return false;
-                activity.requestPermissions(new String[]{Manifest.permission.BLUETOOTH, Manifest.permission.BLUETOOTH_ADMIN, Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.BLUETOOTH_CONNECT}, 919191);
-            } else {
-                if(activity == null){
-                    return false;
-                }
-
-                boolean bluetooth = activity.checkSelfPermission(Manifest.permission.BLUETOOTH) == PackageManager.PERMISSION_GRANTED;
-                boolean fineLocation = activity.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
-                boolean coarseLocation = activity.checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED;
-
-                if (bluetooth && (fineLocation || coarseLocation)) {
-                    return true;
-                }
-
-                if (!request) return false;
-                activity.requestPermissions(new String[]{Manifest.permission.BLUETOOTH, Manifest.permission.BLUETOOTH_ADMIN, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, 919191);
+            if (bluetoothScan && bluetoothConnect) {
+                return true;
             }
 
-            return false;
-        }
+            if (!request || activity == null) return false;
 
-        return true;
+            activity.requestPermissions(new String[]{
+                    Manifest.permission.BLUETOOTH_SCAN,
+                    Manifest.permission.BLUETOOTH_CONNECT
+            }, 919191);
+        } else {
+            boolean bluetooth = context.checkSelfPermission(Manifest.permission.BLUETOOTH) == PackageManager.PERMISSION_GRANTED;
+            boolean fineLocation = context.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
+
+            if (bluetooth && fineLocation) {
+                return true;
+            }
+
+            if (!request || activity == null) return false;
+
+            activity.requestPermissions(new String[]{
+                    Manifest.permission.BLUETOOTH,
+                    Manifest.permission.ACCESS_FINE_LOCATION
+            }, 919191);
+        }
+        return false;
+    } 
+    return true;
     }
 
     private void startDiscovery(boolean requestPermission) {
